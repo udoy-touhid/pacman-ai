@@ -11,8 +11,9 @@ import javax.swing.JFrame;
 public class PacMan extends JFrame {
 
     public static final int N_BLOCKS = 15;
-    public static final int maximum = 9;
-    
+    public static final int maximum = 7;
+      
+    static Graph graph;
 
     public static final short levelData[][] = {
         {19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22},
@@ -31,9 +32,9 @@ public class PacMan extends JFrame {
         {1, 25, 24, 24, 24, 24, 24, 24, 24, 24, 16, 16, 16, 18, 20},
         {9, 8, 8, 8, 8, 8, 8, 8, 8, 8, 25, 24, 24, 24, 28}
     };
-    static char grid[][];
-    static int path[][];
-    static int shortest[][];
+    public static char grid[][];
+    //static int path[][];
+    //static int shortest[][];
 
     public PacMan() {
 
@@ -60,20 +61,19 @@ public class PacMan extends JFrame {
         int index =0;
                 
         
-        path = new int[N_BLOCKS+1][N_BLOCKS+1];
-        shortest = new int[N_BLOCKS*N_BLOCKS+1][N_BLOCKS*N_BLOCKS+1];
+        //path = new int[N_BLOCKS+1][N_BLOCKS+1];
+        //shortest = new int[N_BLOCKS*N_BLOCKS+1][N_BLOCKS*N_BLOCKS+1];
 
         grid = new char[N_BLOCKS+1][N_BLOCKS+1];
         
-        for (int i = 0; i < N_BLOCKS*N_BLOCKS; i++) {
-
-            for (int j = 0; j < N_BLOCKS*N_BLOCKS; j++) {
-
-                if(i!=j){
-                    shortest[i][j] = maximum;
-                }
-            }
-        }
+//        for (int i = 0; i < N_BLOCKS*N_BLOCKS; i++) {
+//
+//            for (int j = 0; j < N_BLOCKS*N_BLOCKS; j++) {
+//
+//                shortest[i][j] = maximum;
+//                
+//            }
+//        }
         
         
         for (int i = 0; i < N_BLOCKS; i++) {
@@ -91,66 +91,28 @@ public class PacMan extends JFrame {
             System.out.println("");
         }
         
-
-        for (int i = 0; i < N_BLOCKS; i++) {
-
-            for (int j = 0; j < N_BLOCKS; j++) {
-                
-                if(!checkIfValid(i,j)){
-                    
-                    continue;
-                }
-
-                if(checkIfValid(i,j+1))
-                    path[i][j+1]++;
-                if(checkIfValid(i,j-1))
-                    path[i][j-1]++;
-                if(checkIfValid(i+1,j))
-                    path[i+1][j]++;
-                if(checkIfValid(i-1,j))
-                    path[i-1][j]++;           
-               
-            }
-        }
+        //graph = new Graph(); 
+        //graph.pathExists(grid,5,5,9,9);
         
-//        for (int i = 0; i < N_BLOCKS; i++) {
-//
-//            for (int j = 0; j < N_BLOCKS; j++) {
-//
-//              
-//                System.out.print(path[i][j] + "  ");
-//
-//            }
-//            System.out.println("");
-//        }
-        
-        
-        System.out.println("==========================================");
-
-        
-        for (int i = 0; i < N_BLOCKS*N_BLOCKS; i++) {
-
-            for (int j = 0; j < N_BLOCKS*N_BLOCKS; j++) {
-
-                System.out.print(shortest[i][j]+"  ");
-            }
-                        
-            System.out.println("");
-
-        }
+  
+      
+       
          
         
     }
     
-    static boolean checkIfValid(int x,int y){
+    static boolean checkIfValid(int x,int y,int rootX, int rootY){
         
         if(x<0||y<0||x>=N_BLOCKS || y>=N_BLOCKS)
             return false;
         if(grid[x][y]=='.'){
+          
             
-            shortest[x][y] = 1;
+            
             return true;
         }
         return false;
     }
+    
+   
 }

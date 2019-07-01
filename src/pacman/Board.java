@@ -5,7 +5,6 @@
  */
 package pacman;
 
-
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Dimension;
@@ -20,10 +19,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JPanel;
 import javax.swing.Timer;
+import pacman.Graph.Node;
+import static pacman.PacMan.N_BLOCKS;
+import static pacman.PacMan.grid;
+import static pacman.PacMan.levelData;
 
 public class Board extends JPanel implements ActionListener {
 
@@ -66,7 +71,6 @@ public class Board extends JPanel implements ActionListener {
     //4 is a right border, 
     //8 is a bottom border and 
     //16 is a point
-    
     public static final short levelData[] = {
         19, 26, 26, 26, 18, 18, 18, 18, 18, 18, 18, 18, 18, 18, 22,
         21, 0, 0, 0, 17, 16, 16, 16, 16, 16, 16, 16, 16, 16, 20,
@@ -91,6 +95,7 @@ public class Board extends JPanel implements ActionListener {
     private int currentSpeed = 3;
     private short[] screenData;
     private Timer timer;
+    private Graph graph;
 
     public Board() {
 
@@ -98,9 +103,9 @@ public class Board extends JPanel implements ActionListener {
         initVariables();
         initBoard();
     }
-    
+
     private void initBoard() {
-        
+
         addKeyListener(new TAdapter());
 
         setFocusable(true);
@@ -120,7 +125,9 @@ public class Board extends JPanel implements ActionListener {
         ghostSpeed = new int[MAX_GHOSTS];
         dx = new int[4];
         dy = new int[4];
-        
+
+        graph = new Graph();
+
         timer = new Timer(40, this);
         timer.start();
     }
@@ -235,6 +242,7 @@ public class Board extends JPanel implements ActionListener {
 
     private void moveGhosts(Graphics2D g2d) {
 
+        
         short i;
         int pos;
         int count;
@@ -293,6 +301,36 @@ public class Board extends JPanel implements ActionListener {
 
             }
 
+            if (i < 5)
+            {
+                //System.out.println("x:" + (int) ghost_x[i] / 24 + "..+y:" + (int) ghost_y[i] / 24);
+                //graph.pathExists(PacMan.grid, , , req_dx, req_dy);
+
+                Node node = graph.pathExists( pacman_y / BLOCK_SIZE, pacman_x / BLOCK_SIZE, ghost_y[i] / BLOCK_SIZE,
+                        ghost_x[i] / BLOCK_SIZE);
+
+                if (node != null) {
+                    if(ghost_x[i] - node.y * BLOCK_SIZE>0)
+                        ghost_dx[i] = -1;
+                    else if(ghost_x[i] - node.y * BLOCK_SIZE<0)
+                        ghost_dx[i] = 1;
+                    else ghost_dx[i] = 0;
+                    
+                    if(ghost_y[i] - node.x * BLOCK_SIZE>0)
+                        ghost_dy[i] = -1;
+                    else if(ghost_y[i] - node.x * BLOCK_SIZE<0)
+                        ghost_dy[i] = 1;
+                    else ghost_dy[i] = 0;
+                    //ghost_y[i] = node.x * BLOCK_SIZE;
+                    System.out.println("ok node");
+
+                } else {
+                    System.out.println("null node");
+                }
+
+            } 
+                
+            
             ghost_x[i] = ghost_x[i] + (ghost_dx[i] * ghostSpeed[i]);
             ghost_y[i] = ghost_y[i] + (ghost_dy[i] * ghostSpeed[i]);
             drawGhost(g2d, ghost_x[i] + 1, ghost_y[i] + 1);
@@ -303,6 +341,11 @@ public class Board extends JPanel implements ActionListener {
 
                 dying = true;
             }
+//            try {
+//               // Thread.sleep(10000L);
+//            } catch (InterruptedException ex) {
+//                Logger.getLogger(Board.class.getName()).log(Level.SEVERE, null, ex);
+//            }
         }
     }
 
@@ -453,25 +496,25 @@ public class Board extends JPanel implements ActionListener {
                 g2d.setColor(mazeColor);
                 g2d.setStroke(new BasicStroke(2));
 
-                if ((screenData[i] & 1) != 0) { 
+                if ((screenData[i] & 1) != 0) {
                     g2d.drawLine(x, y, x, y + BLOCK_SIZE - 1);
                 }
 
-                if ((screenData[i] & 2) != 0) { 
+                if ((screenData[i] & 2) != 0) {
                     g2d.drawLine(x, y, x + BLOCK_SIZE - 1, y);
                 }
 
-                if ((screenData[i] & 4) != 0) { 
+                if ((screenData[i] & 4) != 0) {
                     g2d.drawLine(x + BLOCK_SIZE - 1, y, x + BLOCK_SIZE - 1,
                             y + BLOCK_SIZE - 1);
                 }
 
-                if ((screenData[i] & 8) != 0) { 
+                if ((screenData[i] & 8) != 0) {
                     g2d.drawLine(x, y + BLOCK_SIZE - 1, x + BLOCK_SIZE - 1,
                             y + BLOCK_SIZE - 1);
                 }
 
-                if ((screenData[i] & 16) != 0) { 
+                if ((screenData[i] & 16) != 0) {
                     g2d.setColor(dotColor);
                     g2d.fillRect(x + 11, y + 11, 2, 2);
                 }
@@ -603,7 +646,7 @@ public class Board extends JPanel implements ActionListener {
                     req_dy = 1;
                 } else if (key == KeyEvent.VK_ESCAPE && timer.isRunning()) {
                     inGame = false;
-                } else if (key == KeyEvent.VK_PAUSE) {
+                } else if (key == KeyEvent.VK_0) {
                     if (timer.isRunning()) {
                         timer.stop();
                     } else {
